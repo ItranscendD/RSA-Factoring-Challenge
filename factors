@@ -1,0 +1,29 @@
+#!/usr/bin/python3
+
+import sys
+
+def factors(n):
+    i = 2
+    while i * i <= n:
+        if n % i:
+            i += 1
+        else:
+            n //= i
+            return i, n
+    return n, 1
+
+def main():
+    if len(sys.argv) != 2:
+        print("Usage: {} <file>".format(sys.argv[0]))
+        sys.exit(1)
+
+    filename = sys.argv[1]
+
+    with open(filename, 'r') as file:
+        for line in file:
+            number = int(line.strip())
+            factor1, factor2 = factors(number)
+            print("{}={}*{}".format(number, factor1, factor2))
+
+if __name__ == "__main__":
+    main()
