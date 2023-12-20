@@ -3,44 +3,57 @@
 import sys
 import math
 
+
 def gcd(a, b):
     while b:
         a, b = b, a % b
     return a
 
-def rho_factorize(n):
+
+def pollards_rho(n):
+    def f(x):
+        return (x**2 + 1) % n
+
     x = 2
     y = 2
     d = 1
-
-    f = lambda x: (x**2 + 1) % n
 
     while d == 1:
         x = f(x)
         y = f(f(y))
         d = gcd(abs(x - y), n)
 
-    return d, n // d
+    return d
 
-def is_prime(num):
-    if num < 2:
-        return False
-    for i in range(2, int(math.sqrt(num)) + 1):
-        if num % i == 0:
-            return False
-    return True
 
-def rsa_factorization(filename):
-    with open(filename, 'r') as file:
-        for line in file:
-            n = int(line.strip())
-            p, q = rho_factorize(n)
-            print("{}={}*{}".format(n, p, q))
+def factorize_rsa_number(n):
+    factors = []
+    while n > 1:
+        factor = pollards_rho(n)
+        while n % factor == 0:
+            factors.append(factor)
+            n //= factor
 
-if __name__ == "__main__":
+    return factors
+
+
+def print_factorization(n, factors):
+    print(f"{n}={'*'.join(map(str, factors))}")
+
+
+def main():
     if len(sys.argv) != 2:
-        print("Usage: {} <file>".format(sys.argv[0]))
+        print("Usage: rsa <file>")
         sys.exit(1)
 
-    filename = sys.argv[1]
-    rsa_factorization(filename)
+    input_file = sys.argv[1]
+
+    with open(input_file, 'r') as file:
+        for line in file:
+            n = int(line.strip())
+            factors = factorize_rsa_number(n)
+            print_factorization(n, factors)
+
+
+if __name__ == "__main__":
+    main()
